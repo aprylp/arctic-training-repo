@@ -1,0 +1,38 @@
+---
+title: "Tidying Data in R"
+author: "Apryl Perry"
+date: "August 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+can delete other info that comes at the start at rmarkdown, but need to leave the above setup code
+
+Calling a masked function:
+
+If you call filter w/o calling stats, b/c of the way the pkgs were loaded.  These functions do specifically different things.  See notes in yellow above (currently supressed by the command options warning and message and echo above).
+
+use
+packageName::functionName
+or 
+stats::filter()
+depending on which package function you want to use.
+
+```{r, warning = F, message = F}
+library(dplyr)
+library(tidyr)
+```
+
+Read in data from [Mike Byerly. 2016. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2] (https://knb.ecoinformatics.org/#view/df35b.304.2).
+
+```{r}
+catch_df <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", method = "libcurl"),
+                    stringsAsFactors = FALSE)
+head(catch_df)
+```
+
+
+
