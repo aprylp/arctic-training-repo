@@ -34,5 +34,103 @@ catch_df <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df3
 head(catch_df)
 ```
 
+Data in the above output is not Tidy.  Fish names in columns and All column is a sum column
+
+
+About the pipe editor
+The pipe will take the output of a previous statement, and use it as the input to the next statement. 
+ctrl-shift-m is keyboard shortcut for pipe operator
+chains operations or functions together
+ctrl dash shortcut for assignment operator
+
+df_filtered <- filter(df, ...)
+df_selected <- select(df_filtered, ...)
+
+can write:
+df_cleaned <- df %>% 
+              filter(...) %>%
+              select(...)
+              
+In the Tidy verse, all data is assumed to be a dataframe (that is what the (.data, ...)) part of the code represents, but you will probably never explicitly state this.
+Select the columns you want by name              
+```{r}
+catch_df %>% 
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum)
+
+```
+
+or specify the column you don't want by using the - sign.
+```{r}
+
+catch_df %>% 
+  select(-All, -notesRegCode)
+  
+head(catch_df)
+
+```
+Need to place %>%  at end of the line if adding another function.  Place the next function underneath for 
+easier readability.
+
+```{r}
+catch_df <- catch_df %>% 
+  select(-All, -notesRegCode) # %>% 
+  # filter(...)
+head(catch_df)
+
+```
+
+key = column name, value = value in columns
+What am i turning the column names into?
+Gather will only return two columns unless you specifically tell it otherwise, -Region, -Year will cause the info from these columns to also be displayed. - in the gather statement means don't write over these columns.
+rename function without using index or list selector operator
+rename catch column to include units
+```{r}
+catch_df <- catch_df %>% 
+  gather(key = "species", value = "catch", -Region, -Year) %>% 
+  rename(catch_thousand = catch)
+
+unique(catch_df$species) # shows the names of unique names in species column
+head(catch_df)
+``` 
+
+reverse of gather is spread function
+
+note that the catch_thousands is a character column and not numeric so mutate returns an error.  
+
+```{r}
+catch_integers <-  as.integer(catch_df$catch_thousand)
+
+i <- which(is.na(catch_integers) == T)
+
+catch_df$catch_thousand[i]
+```
+
+Warning above is due to not being able to turn some values into a number.
+second line of code allows you to inspect what happened above and only returns the values that are true to the above statement
+third line allows you to inspect those items
+
+The mutate function allows you to create new columns but to fix above issue, need to:
+1) need to turn I into 1 in the catch_thousand column
+2) coerce catch_thousand into integer type
+3) convert catch_thousand to catch
+
+```{r}
+catch_df <- catch_df %>% 
+  mutate(catch_thousand = ifelse(catch_thousand == "I", 1, catch_thousand)) %>% 
+  mutate(catch_thousand = as.integer(catch_thousand)) %>% 
+  mutate(catch = catch_thousand * 1000)
+  
+
+tail(catch_df)
+# head(catch_df)
+# summary(catch_df)
+```
+
+
+
+
+
+
+
 
 
