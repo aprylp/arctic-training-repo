@@ -13,7 +13,7 @@ can delete other info that comes at the start at rmarkdown, but need to leave th
 
 Calling a masked function:
 
-If you call filter w/o calling stats, b/c of the way the pkgs were loaded.  These functions do specifically different things.  See notes in yellow above (currently supressed by the command options warning and message and echo above).
+If you call filter w/o calling stats, b/c of the way the pkgs were loaded.  These functions do specifically different things.  See notes in yellow above (currently suppressed by the command options warning and message and echo above).
 
 use
 packageName::functionName
@@ -51,7 +51,7 @@ df_cleaned <- df %>%
               filter(...) %>%
               select(...)
               
-In the Tidy verse, all data is assumed to be a dataframe (that is what the (.data, ...)) part of the code represents, but you will probably never explicitly state this.
+In the Tidy verse, all data is assumed to be a data frame (that is what the (.data, ...)) part of the code represents, but you will probably never explicitly state this.
 Select the columns you want by name              
 ```{r}
 catch_df %>% 
@@ -119,12 +119,121 @@ catch_df <- catch_df %>%
   mutate(catch_thousand = ifelse(catch_thousand == "I", 1, catch_thousand)) %>% 
   mutate(catch_thousand = as.integer(catch_thousand)) %>% 
   mutate(catch = catch_thousand * 1000)
-  
 
 tail(catch_df)
 # head(catch_df)
 # summary(catch_df)
 ```
+
+
+alt-shift-k gives a list of keyboard shortcuts in RStudio
+ctrl-shift-= zooms all panes (seems to do all of computer also...)
+
+#Split_Apply_Combine
+Performing mean function on catch column by region
+Only has two columns b/c we have averaged over the year and species column
+with summarise, the output needs to be one value (note will take both english and british spelling of summarize)
+
+```{r}
+catch_sum <- catch_df %>% 
+  group_by(Region) %>% 
+  summarise(mean_catch = mean(catch))
+head(catch_sum, 10) #Shows the first 10 rows instead of the default setting
+```
+Create catch low and catch high columns averaged over species and years for both columns
+
+```{r}
+catch_range <- catch_df %>% 
+  group_by(Region) %>% 
+  summarise(catch_low = range(catch)[1],
+            catch_high = range(catch)[2])
+head(catch_range, 10)
+```
+
+or grouped by year
+
+```{r}
+catch_range <- catch_df %>% 
+  group_by(Year) %>% 
+  summarise(catch_low = range(catch)[1],
+            catch_high = range(catch)[2])
+head(catch_range, 10)
+```
+What is the number of observations in each grouping
+
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region) %>% 
+  #calculate mean, sd, n
+  summarise(catch_mean = mean(catch, na.rm = T),
+            catch_stdev = sd(catch, na.rm = T),
+            num_obs = n())
+head(catch_mean, 10)
+```
+
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region, species) %>% #Group by Region and species
+  #calculate mean, sd, n
+  summarise(catch_mean = mean(catch, na.rm = T),
+            catch_stdev = sd(catch, na.rm = T),
+            num_obs = n())
+head(catch_mean, 10)
+```
+Filter
+
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region, species) %>% 
+  summarise(catch_mean = mean(catch, na.rm = T),
+            catch_stdev = sd(catch, na.rm = T),
+            num_obs = n()) %>% 
+#filter for Chinook
+filter(species == "Chinook") %>% 
+  filter(catch_mean > 2000)
+head(catch_mean, 10)
+
+```
+```{r}
+catch_year <-  catch_df %>% 
+  filter(Year > 1990 | Year < 1900) %>% # use & for and currently is filtering for > 1990 or < 1900
+  group_by(Year, species) %>% 
+  summarize(catch_sum = sum(catch))
+
+head(catch_year)
+# print(catch_year) shows all records
+```
+
+Joins
+Left join will return all of the rows from the left side table and add on any columns from the right side using the table key (in this case the key is the Region column)
+If there is no matching value in the right side, NA will be filled in instead as it maintains data set integrity.  This is also a good way to find potential issues in the data set. 
+Joins should be extremely predictable
+If left join added rows, then something went wrong.  If you have dupliate identifiers in the identifyer row, you will get duplicate rows...potentially a lot of them
+
+If there are more rows in the right table, they will be discarded (with a left join)
+
+```{r} 
+# Read in data from URL
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+head(region_defs)
+```
+
+only interested in management column use select function
+```{r}
+region_defs <-  region_defs %>% 
+  select(code, mgmtArea)
+
+head(region_defs)
+```
+
+```{r}
+#If both columns being used in the join have the exact same name, R can guess, otherwise they need to be specified as shown below.  Can have multiple key columns, just separate by a comma
+catch_joined <- left_join(catch_df, region_defs, by = c("Region" = "code"))
+    
+head(catch_joined)
+```
+
 
 
 
