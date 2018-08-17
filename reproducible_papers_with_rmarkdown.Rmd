@@ -18,3 +18,9 @@ rrtools::create_compendium("testpaper") #creates a new R pkg with a directory st
 ```
 
 Next go to new RMarkdown that has opened and navigate to analysis folder, then paper, open paper.rmd file to modify as desired.  Note: data should be stored in an archival repository and should be access from there, not from the data folder included in this file directory!
+
+Create empty repository on github, do not initalize
+In R terminal window run
+git remote add origin and paste the url for the repository in
+git remote fetch origin
+
