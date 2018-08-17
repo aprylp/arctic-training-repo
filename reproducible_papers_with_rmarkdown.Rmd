@@ -1,0 +1,20 @@
+---
+title: "reproducible_papers_with_rmarkdown"
+author: "Apryl Perry"
+date: "August 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+If pkg is not avaialbe on CRAN b/c it is still in developement, you can still get the developement version from github using the following:
+
+```{r}
+install.packages("captioner") #for storing figure and table captions
+devtools::install_github("benmarwick/rrtools") #devlopement version not available as a CRAN package yet
+rrtools::create_compendium("testpaper") #creates a new R pkg with a directory structure ready to perform analysis
+```
+
+Next go to new RMarkdown that has opened and navigate to analysis folder, then paper, open paper.rmd file to modify as desired.  Note: data should be stored in an archival repository and should be access from there, not from the data folder included in this file directory!
