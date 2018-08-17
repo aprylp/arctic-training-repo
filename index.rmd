@@ -93,4 +93,9 @@ leaflet(locs) %>%
   addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
 ```
 
+Chapter 16 Git collaberation and conflict management
+
+```{r}
+
+```
 
